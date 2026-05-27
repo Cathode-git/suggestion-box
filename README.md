@@ -85,12 +85,12 @@ If you use Let's Encrypt via Traefik, add `traefik.http.routers.suggest.tls.cert
 ## Building from source
 
 ```bash
-git clone https://github.com/your-org/suggest-app.git
-cd suggest-app
-docker build -t suggest-app:local .
+git clone https://github.com/your-org/suggestion-box.git
+cd suggestion-box
+docker build -t suggestion-box:local .
 ```
 
-Then replace `cathode/suggestion-box:latest` in either compose example above with `suggest-app:local`.
+Then replace `cathode/suggestion-box:latest` in either compose example above with `suggestion-box:local`.
 
 ## Routes
 
