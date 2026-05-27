@@ -1,4 +1,4 @@
-# suggest-app
+# suggestion-box App
 
 A lightweight self-hosted suggestion box. Users submit ideas, vote on them (one toggle-vote per browser), and an admin can triage each entry with a status label.
 
