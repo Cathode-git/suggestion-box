@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — {{ title }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="max-w-4xl mx-auto px-4 py-10">
+
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-2xl font-bold text-gray-800">Admin — {{ title }}</h1>
+      <div class="flex items-center gap-4">
+        <a href="/" class="text-sm text-blue-600 hover:underline">← Public view</a>
+        <a href="/admin/logout" class="text-sm text-gray-400 hover:text-gray-600">Sign out</a>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      {% if not suggestions %}
+      <div class="text-center text-gray-400 py-12">No suggestions yet.</div>
+      {% else %}
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200 text-left">
+          <tr>
+            <th class="px-4 py-3 text-gray-600 font-medium">Suggestion</th>
+            <th class="px-4 py-3 text-gray-600 font-medium w-16 text-center">Votes</th>
+            <th class="px-4 py-3 text-gray-600 font-medium w-52">Status</th>
+            <th class="px-4 py-3 text-gray-600 font-medium w-20"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for s in suggestions %}
+          {% set label = status_labels[s.status][0] if s.status in status_labels else 'Open' %}
+          {% set badge = status_labels[s.status][1] if s.status in status_labels else 'bg-blue-100 text-blue-700' %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3">
+              <p class="font-medium text-gray-800">{{ s.title }}</p>
+              {% if s.description %}
+              <p class="text-gray-400 text-xs mt-0.5 line-clamp-1 max-w-sm">{{ s.description }}</p>
+              {% endif %}
+              <p class="text-gray-400 text-xs mt-0.5">{{ s.author }} · {{ s.created_at[:10] }}</p>
+            </td>
+            <td class="px-4 py-3 text-center font-semibold text-gray-700">{{ s.votes }}</td>
+            <td class="px-4 py-3">
+              <form method="post" action="/admin/status/{{ s.id }}" class="flex items-center gap-2">
+                <select name="status"
+                  class="border border-gray-200 rounded-lg px-2 py-1.5 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-blue-400">
+                  {% for st in statuses %}
+                  <option value="{{ st }}" {% if s.status == st %}selected{% endif %}>
+                    {{ status_labels[st][0] }}
+                  </option>
+                  {% endfor %}
+                </select>
+                <button type="submit"
+                  class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition font-medium">
+                  Save
+                </button>
+              </form>
+            </td>
+            <td class="px-4 py-3">
+              <form method="post" action="/admin/delete/{{ s.id }}"
+                onsubmit="return confirm('Delete this suggestion?')">
+                <button type="submit"
+                  class="text-xs text-red-400 hover:text-red-600 transition font-medium">
+                  Delete
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
