@@ -4,26 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title }}</title>
+  <script>if (localStorage.theme === 'dark') document.documentElement.classList.add('dark')</script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
+
+  <button onclick="toggleTheme()" title="Toggle dark mode"
+    class="fixed top-4 right-4 p-2 rounded-lg text-gray-400 dark:text-yellow-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition z-50">
+    <svg class="h-5 w-5 dark:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+    </svg>
+    <svg class="h-5 w-5 hidden dark:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 .75a8.25 8.25 0 00-4.135 15.39c.686.398 1.115 1.008 1.134 1.623a.75.75 0 00.577.706c.352.083.71.148 1.074.195.323.041.6-.218.6-.544v-4.661a6.714 6.714 0 01-.937-.171.75.75 0 11.374-1.453 5.261 5.261 0 002.5 0 .75.75 0 11.373 1.453 6.679 6.679 0 01-.937.171v4.661c0 .326.277.585.6.544.364-.047.722-.112 1.074-.195a.75.75 0 00.577-.706c.02-.615.448-1.225 1.134-1.623A8.25 8.25 0 0012 .75z" />
+      <path fill-rule="evenodd" d="M9.013 19.9a.75.75 0 01.877-.597 11.319 11.319 0 004.22 0 .75.75 0 11.28 1.473 12.819 12.819 0 01-4.78 0 .75.75 0 01-.597-.876zM9.754 22.344a.75.75 0 01.824-.668 13.682 13.682 0 002.844 0 .75.75 0 11.156 1.492 15.156 15.156 0 01-3.156 0 .75.75 0 01-.668-.824z" clip-rule="evenodd" />
+    </svg>
+  </button>
+
   <div class="max-w-2xl mx-auto px-4 py-10">
 
     <div class="mb-8 text-center">
-      <h1 class="text-3xl font-bold text-gray-800">💡 {{ title }}</h1>
-      <p class="text-gray-500 mt-1">Share your ideas and vote for the ones you like</p>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">💡 {{ title }}</h1>
+      <p class="text-gray-500 dark:text-gray-400 mt-1">Share your ideas and vote for the ones you like</p>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-      <h2 class="text-base font-semibold text-gray-700 mb-4">Submit a suggestion</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+      <h2 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-4">Submit a suggestion</h2>
       <form method="post" action="/suggest" class="space-y-3">
         <input type="text" name="title" placeholder="Your idea *" required maxlength="200"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
         <textarea name="description" placeholder="Details (optional)" rows="2" maxlength="1000"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
+          class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
         <div class="flex gap-3">
           <input type="text" name="author" placeholder="Your name (optional)" maxlength="80"
-            class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+            class="flex-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
           <button type="submit"
             class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
             Submit
@@ -35,31 +49,31 @@
     <div class="flex gap-2 mb-4">
       <a href="/?sort=votes"
         class="text-sm px-3 py-1 rounded-full transition
-          {% if sort == 'votes' %}bg-blue-600 text-white{% else %}bg-white text-gray-600 border border-gray-300 hover:bg-gray-50{% endif %}">
+          {% if sort == 'votes' %}bg-blue-600 text-white{% else %}bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
         Top
       </a>
       <a href="/?sort=newest"
         class="text-sm px-3 py-1 rounded-full transition
-          {% if sort == 'newest' %}bg-blue-600 text-white{% else %}bg-white text-gray-600 border border-gray-300 hover:bg-gray-50{% endif %}">
+          {% if sort == 'newest' %}bg-blue-600 text-white{% else %}bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
         Newest
       </a>
     </div>
 
     {% if not suggestions %}
-    <div class="text-center text-gray-400 py-16">No suggestions yet — be the first!</div>
+    <div class="text-center text-gray-400 dark:text-gray-500 py-16">No suggestions yet — be the first!</div>
     {% endif %}
 
     <div class="space-y-3">
       {% for s in suggestions %}
       {% set label = status_labels[s.status][0] if s.status in status_labels else 'Open' %}
-      {% set badge = status_labels[s.status][1] if s.status in status_labels else 'bg-blue-100 text-blue-700' %}
+      {% set badge = status_labels[s.status][1] if s.status in status_labels else 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' %}
       {% set voted = s.id in voted_ids %}
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex gap-4">
+      <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 flex gap-4">
         <form method="post" action="/vote/{{ s.id }}" class="flex-shrink-0">
           <input type="hidden" name="sort" value="{{ sort }}">
           <button type="submit"
             class="flex flex-col items-center justify-center w-12 h-12 rounded-lg border transition
-              {% if voted %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-500 border-gray-200 hover:border-blue-400 hover:text-blue-500{% endif %}">
+              {% if voted %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-400 hover:text-blue-500{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
             </svg>
@@ -68,21 +82,28 @@
         </form>
         <div class="flex-1 min-w-0">
           <div class="flex items-start justify-between gap-2">
-            <p class="font-medium text-gray-800 text-sm leading-snug">{{ s.title }}</p>
+            <p class="font-medium text-gray-800 dark:text-gray-100 text-sm leading-snug">{{ s.title }}</p>
             <span class="text-xs px-2 py-0.5 rounded-full flex-shrink-0 {{ badge }}">{{ label }}</span>
           </div>
           {% if s.description %}
-          <p class="text-gray-500 text-xs mt-1 leading-relaxed">{{ s.description }}</p>
+          <p class="text-gray-500 dark:text-gray-400 text-xs mt-1 leading-relaxed">{{ s.description }}</p>
           {% endif %}
-          <p class="text-gray-400 text-xs mt-2">{{ s.author }} · {{ s.created_at[:10] }}</p>
+          <p class="text-gray-400 dark:text-gray-500 text-xs mt-2">{{ s.author }} · {{ s.created_at[:10] }}</p>
         </div>
       </div>
       {% endfor %}
     </div>
 
-    <p class="text-center text-xs text-gray-300 mt-10">
-      <a href="/admin" class="hover:text-gray-400">admin</a>
+    <p class="text-center text-xs text-gray-300 dark:text-gray-600 mt-10">
+      <a href="/admin" class="hover:text-gray-400 dark:hover:text-gray-500">admin</a>
     </p>
   </div>
+
+  <script>
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark')
+      localStorage.theme = isDark ? 'dark' : 'light'
+    }
+  </script>
 </body>
 </html>
