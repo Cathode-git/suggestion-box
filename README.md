@@ -30,7 +30,7 @@ Runs the app directly on a host port. Suitable for local use or simple setups wi
 services:
   suggest:
     image: cathode/suggestion-box:latest
-    container_name: suggest
+    container_name: suggestion-box
     restart: unless-stopped
     ports:
       - "8000:8000"
@@ -55,7 +55,7 @@ Assumes Traefik is already running on an external Docker network (`proxy` in thi
 services:
   suggest:
     image: cathode/suggestion-box:latest
-    container_name: suggest
+    container_name: suggestion-box
     restart: unless-stopped
     networks:
       - proxy
@@ -66,7 +66,7 @@ services:
       - suggest_data:/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.suggest.rule=Host(`suggest.example.com`)"
+      - "traefik.http.routers.suggest.rule=Host(`suggestion-box.example.com`)"
       - "traefik.http.routers.suggest.entrypoints=websecure"
       - "traefik.http.routers.suggest.tls=true"
       - "traefik.http.services.suggest.loadbalancer.server.port=8000"
@@ -79,7 +79,7 @@ networks:
     external: true
 ```
 
-Replace `suggest.example.com` with your actual hostname.  
+Replace `suggestion-box.example.com` with your actual hostname.  
 If you use Let's Encrypt via Traefik, add `traefik.http.routers.suggest.tls.certresolver=letsencrypt` to the labels.
 
 ## Building from source
