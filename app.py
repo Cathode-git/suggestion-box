@@ -16,10 +16,10 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "changeme")
 SITE_TITLE = os.getenv("SITE_TITLE", "Suggestion Box")
 
 STATUS_LABELS = {
-    "open":      ("Open",      "bg-blue-100 text-blue-700"),
-    "reviewing": ("Reviewing", "bg-yellow-100 text-yellow-700"),
-    "done":      ("Done",      "bg-green-100 text-green-700"),
-    "rejected":  ("Rejected",  "bg-gray-100 text-gray-500"),
+    "open":      ("Open",      "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"),
+    "reviewing": ("Reviewing", "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300"),
+    "done":      ("Done",      "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300"),
+    "rejected":  ("Rejected",  "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"),
 }
 
 
