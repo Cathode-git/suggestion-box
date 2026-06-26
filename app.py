@@ -4,6 +4,7 @@ import json
 import hmac
 import hashlib
 import secrets
+from contextlib import closing
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -31,20 +32,19 @@ def get_db():
 
 def init_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = get_db()
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS suggestions (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            title       TEXT NOT NULL,
-            description TEXT DEFAULT '',
-            author      TEXT DEFAULT 'Anonymous',
-            votes       INTEGER DEFAULT 0,
-            status      TEXT DEFAULT 'open',
-            created_at  TEXT DEFAULT (datetime('now'))
-        )
-    """)
-    conn.commit()
-    conn.close()
+    with closing(get_db()) as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS suggestions (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                title       TEXT NOT NULL,
+                description TEXT DEFAULT '',
+                author      TEXT DEFAULT 'Anonymous',
+                votes       INTEGER DEFAULT 0,
+                status      TEXT DEFAULT 'open',
+                created_at  TEXT DEFAULT (datetime('now'))
+            )
+        """)
+        conn.commit()
 
 
 init_db()
@@ -74,10 +74,9 @@ def get_voted_ids(request: Request) -> list:
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request, sort: str = "votes"):
-    conn = get_db()
     order = "votes DESC, created_at DESC" if sort == "votes" else "created_at DESC"
-    rows = conn.execute(f"SELECT * FROM suggestions ORDER BY {order}").fetchall()
-    conn.close()
+    with closing(get_db()) as conn:
+        rows = conn.execute(f"SELECT * FROM suggestions ORDER BY {order}").fetchall()
     return templates.TemplateResponse("index.html", {
         "request": request,
         "suggestions": rows,
@@ -97,34 +96,32 @@ async def create_suggestion(
     title = title.strip()
     if not title:
         return RedirectResponse("/", status_code=303)
-    conn = get_db()
-    conn.execute(
-        "INSERT INTO suggestions (title, description, author) VALUES (?, ?, ?)",
-        (title, description.strip(), author.strip() or "Anonymous"),
-    )
-    conn.commit()
-    conn.close()
+    with closing(get_db()) as conn:
+        conn.execute(
+            "INSERT INTO suggestions (title, description, author) VALUES (?, ?, ?)",
+            (title, description.strip(), author.strip() or "Anonymous"),
+        )
+        conn.commit()
     return RedirectResponse("/", status_code=303)
 
 
 @app.post("/vote/{suggestion_id}")
 async def vote(request: Request, suggestion_id: int, sort: str = Form("votes")):
     voted_ids = get_voted_ids(request)
-    conn = get_db()
-    if suggestion_id in voted_ids:
-        conn.execute(
-            "UPDATE suggestions SET votes = MAX(0, votes - 1) WHERE id = ?",
-            (suggestion_id,),
-        )
-        voted_ids.remove(suggestion_id)
-    else:
-        conn.execute(
-            "UPDATE suggestions SET votes = votes + 1 WHERE id = ?",
-            (suggestion_id,),
-        )
-        voted_ids.append(suggestion_id)
-    conn.commit()
-    conn.close()
+    with closing(get_db()) as conn:
+        if suggestion_id in voted_ids:
+            conn.execute(
+                "UPDATE suggestions SET votes = MAX(0, votes - 1) WHERE id = ?",
+                (suggestion_id,),
+            )
+            voted_ids.remove(suggestion_id)
+        else:
+            conn.execute(
+                "UPDATE suggestions SET votes = votes + 1 WHERE id = ?",
+                (suggestion_id,),
+            )
+            voted_ids.append(suggestion_id)
+        conn.commit()
     resp = RedirectResponse(f"/?sort={sort}", status_code=303)
     resp.set_cookie("voted", json.dumps(voted_ids), max_age=365 * 24 * 3600, httponly=True)
     return resp
@@ -168,9 +165,8 @@ async def logout():
 async def admin_view(request: Request):
     if not is_authenticated(request):
         return RedirectResponse("/admin/login", status_code=303)
-    conn = get_db()
-    rows = conn.execute("SELECT * FROM suggestions ORDER BY created_at DESC").fetchall()
-    conn.close()
+    with closing(get_db()) as conn:
+        rows = conn.execute("SELECT * FROM suggestions ORDER BY created_at DESC").fetchall()
     return templates.TemplateResponse("admin.html", {
         "request": request,
         "suggestions": rows,
@@ -184,10 +180,9 @@ async def admin_view(request: Request):
 async def update_status(request: Request, suggestion_id: int, status: str = Form(...)):
     if not is_authenticated(request):
         return RedirectResponse("/admin/login", status_code=303)
-    conn = get_db()
-    conn.execute("UPDATE suggestions SET status = ? WHERE id = ?", (status, suggestion_id))
-    conn.commit()
-    conn.close()
+    with closing(get_db()) as conn:
+        conn.execute("UPDATE suggestions SET status = ? WHERE id = ?", (status, suggestion_id))
+        conn.commit()
     return RedirectResponse("/admin", status_code=303)
 
 
@@ -195,8 +190,7 @@ async def update_status(request: Request, suggestion_id: int, status: str = Form
 async def delete_suggestion(request: Request, suggestion_id: int):
     if not is_authenticated(request):
         return RedirectResponse("/admin/login", status_code=303)
-    conn = get_db()
-    conn.execute("DELETE FROM suggestions WHERE id = ?", (suggestion_id,))
-    conn.commit()
-    conn.close()
+    with closing(get_db()) as conn:
+        conn.execute("DELETE FROM suggestions WHERE id = ?", (suggestion_id,))
+        conn.commit()
     return RedirectResponse("/admin", status_code=303)
